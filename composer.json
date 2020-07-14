@@ -1,0 +1,54 @@
+{
+    "name": "tapp/laravel-aws-secrets-manager",
+    "description": "Use AWS Secrets manager to load environment variables for configuration.",
+    "keywords": [
+        "tapp",
+        "laravel-aws-secrets-manager"
+    ],
+    "homepage": "https://github.com/tapp/laravel-aws-secrets-manager",
+    "license": "MIT",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Steve Williamson",
+            "email": "steve@tappnetwork.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^7.1",
+        "illuminate/support": "^6.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^4.0",
+        "phpunit/phpunit": "^8.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Tapp\\LaravelAwsSecretsManager\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tapp\\LaravelAwsSecretsManager\\Tests\\": "tests"
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit",
+        "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
+
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Tapp\\LaravelAwsSecretsManager\\LaravelAwsSecretsManagerServiceProvider"
+            ],
+            "aliases": {
+                "LaravelAwsSecretsManager": "Tapp\\LaravelAwsSecretsManager\\LaravelAwsSecretsManagerFacade"
+            }
+        }
+    }
+}
