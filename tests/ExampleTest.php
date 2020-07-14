@@ -7,12 +7,11 @@ use Tapp\LaravelAwsSecretsManager\LaravelAwsSecretsManagerServiceProvider;
 
 class ExampleTest extends TestCase
 {
-
     protected function getPackageProviders($app)
     {
         return [LaravelAwsSecretsManagerServiceProvider::class];
     }
-    
+
     /** @test */
     public function true_is_true()
     {

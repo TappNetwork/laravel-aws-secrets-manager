@@ -20,8 +20,8 @@ class LaravelAwsSecretsManager
 
     protected $debug;
 
-    public function __construct () {
-
+    public function __construct()
+    {
         $this->variables = config('aws-secrets-manager.variables');
 
         $this->configVariables = config('aws-secrets-manager.variables-config');
@@ -32,7 +32,7 @@ class LaravelAwsSecretsManager
 
         $this->cacheStore = config('aws-secrets-manager.cache-store', 'file');
 
-        $this->enabledEnvironments = config('aws-secrets-manager.enabled-environments', array());
+        $this->enabledEnvironments = config('aws-secrets-manager.enabled-environments', []);
 
         $this->debug = config('aws-secrets-manager.debug', false);
     }
@@ -40,15 +40,14 @@ class LaravelAwsSecretsManager
     public function loadSecrets()
     {
         //load vars from datastore to env
-        if($this->debug) {
+        if ($this->debug) {
             $start = microtime(true);
         }
 
         //Only run this if the evironment is enabled in the config
-        if(in_array(env('APP_ENV'), $this->enabledEnvironments)) {
-            if($this->cache) {
-
-                if(!$this->checkCache()) {
+        if (in_array(env('APP_ENV'), $this->enabledEnvironments)) {
+            if ($this->cache) {
+                if (! $this->checkCache()) {
                     //Cache has expired need to refresh the cache from Datastore
                     $this->getVariables();
                 }
@@ -58,32 +57,31 @@ class LaravelAwsSecretsManager
 
             //Process variables in config that need updating
             $this->updateConfigs();
-
         }
 
         if ($this->debug) {
             $time_elapsed_secs = microtime(true) - $start;
-            error_log("Datastore secret request time: " . $time_elapsed_secs);
+            error_log('Datastore secret request time: '.$time_elapsed_secs);
         }
     }
 
-
     protected function checkCache()
     {
-        foreach($this->variables as $variable) {
+        foreach ($this->variables as $variable) {
             $val = Cache::store($this->cacheStore)->get($variable);
-            if (!is_null($val)) {
+            if (! is_null($val)) {
                 putenv("$variable=$val");
             } else {
                 return false;
             }
         }
+
         return true;
     }
 
     protected function getVariables()
     {
-        try{
+        try {
             $datastore = new DatastoreClient();
 
             $query = $datastore->query();
@@ -99,19 +97,18 @@ class LaravelAwsSecretsManager
         } catch (\Exception $e) {
             // Nothing, this is normal
         }
-
     }
 
     protected function updateConfigs()
     {
-        foreach($this->configVariables as $variable => $configPath) {
+        foreach ($this->configVariables as $variable => $configPath) {
             config([$configPath => env($variable)]);
         }
     }
 
     protected function storeToCache($name, $val)
     {
-        if($this->cache) {
+        if ($this->cache) {
             Cache::store($this->cacheStore)->put($name, $val, now()->addMinutes($this->cacheExpiry));
         }
     }
