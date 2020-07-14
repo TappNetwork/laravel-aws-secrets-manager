@@ -2,7 +2,10 @@
 
 namespace Tapp\LaravelAwsSecretsManager;
 
+use Aws\Exception\AwsException;
+use Aws\SecretsManager\SecretsManagerClient;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 class LaravelAwsSecretsManager
 {
@@ -79,28 +82,21 @@ class LaravelAwsSecretsManager
         try {
             $this->client = new SecretsManagerClient([
                 'version' => '2017-10-17',
-                'region' => config('aws-secrets-manager.debug.region'),
+                'region' => config('aws-secrets-manager.region'),
             ]);
 
-            // TODO Update this to use AWS Secrets manager instead of GAE
-            // $result = $this->client->getSecretValue([
-            //     'SecretId' => $this->connection->secret_id,
-            //     'VersionId' => $this->connection->version_id,
-            // ]);
+            $result = $this->client->getSecretValue([
+                'SecretId' => config('aws-secrets-manager.secrentsArn'),
+            ]);
 
+            $values = json_decode($result['SecretString'], true);
 
-            $query = $datastore->query();
-            $query->kind('Parameters');
-
-            $res = $datastore->runQuery($query);
-            foreach ($res as $parameter) {
-                $name = $parameter['name'];
-                $val = $parameter['value'];
-                putenv("$name=$val");
-                $this->storeToCache($name, $val);
+            foreach (json_decode($result['SecretString'], true) as $key => $secret) {
+                putenv("$key=$secret");
+                $this->storeToCache($key, $secret);
             }
         } catch (\Exception $e) {
-            // Nothing, this is normal
+            Log::error($e->getMessage());
         }
     }
 
