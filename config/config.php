@@ -2,6 +2,10 @@
 
 return [
 
+    'key' => env('AWS_ACCESS_KEY_ID'),
+    'secret' => env('AWS_SECRET_ACCESS_KEY'),
+    'region' => env('AWS_DEFAULT_REGION'),
+
     /*
     |--------------------------------------------------------------------------
     | Environments where this service provider is enabled
@@ -82,6 +86,6 @@ return [
     |
     */
 
-    'debug' => false,
+    'debug' => env('APP_DEBUG', false),
 
 ];

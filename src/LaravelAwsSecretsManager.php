@@ -6,18 +6,13 @@ use Illuminate\Support\Facades\Cache;
 
 class LaravelAwsSecretsManager
 {
+    protected $client;
     protected $variables;
-
     protected $configVariables;
-
     protected $cache;
-
     protected $cacheExpiry;
-
     protected $cacheStore;
-
     protected $enabledEnvironments;
-
     protected $debug;
 
     public function __construct()
@@ -82,7 +77,22 @@ class LaravelAwsSecretsManager
     protected function getVariables()
     {
         try {
-            $datastore = new DatastoreClient();
+            $this->client = new SecretsManagerClient([
+                'version' => '2017-10-17',
+                'region' => config('aws-secrets-manager.debug.region'),
+                // TODO determine if these can live here and AWS defaults to locally stored creds at ~/.aws/credentials
+                'credentials' => [
+                    'key'    => config('aws-secrets-manager.debug.key'),
+                    'secret' => config('aws-secrets-manager.debug.secret'),
+                ],
+            ]);
+
+            // TODO Update this to use AWS Secrets manager instead of GAE
+            // $result = $this->client->getSecretValue([
+            //     'SecretId' => $this->connection->secret_id,
+            //     'VersionId' => $this->connection->version_id,
+            // ]);
+
 
             $query = $datastore->query();
             $query->kind('Parameters');
