@@ -80,11 +80,6 @@ class LaravelAwsSecretsManager
             $this->client = new SecretsManagerClient([
                 'version' => '2017-10-17',
                 'region' => config('aws-secrets-manager.debug.region'),
-                // TODO determine if these can live here and AWS defaults to locally stored creds at ~/.aws/credentials
-                'credentials' => [
-                    'key'    => config('aws-secrets-manager.debug.key'),
-                    'secret' => config('aws-secrets-manager.debug.secret'),
-                ],
             ]);
 
             // TODO Update this to use AWS Secrets manager instead of GAE

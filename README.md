@@ -21,6 +21,16 @@ composer require tapp/laravel-aws-secrets-manager
 // Usage description here
 ```
 
+### AWS Credentials
+
+Since this package utilizes the PHP AWS SDK the following .env values are used or credentials set ~/.aws/credentials.
+
+```
+AWS_ACCESS_KEY_ID
+AWS_SECRET_ACCESS_KEY
+```
+[https://docs.aws.amazon.com/sdk-for-php/v3/developer-guide/guide_credentials.html](https://docs.aws.amazon.com/sdk-for-php/v3/developer-guide/guide_credentials.html)
+
 ### Testing
 
 ``` bash
