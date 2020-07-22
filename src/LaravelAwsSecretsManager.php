@@ -2,7 +2,6 @@
 
 namespace Tapp\LaravelAwsSecretsManager;
 
-use Aws\Exception\AwsException;
 use Aws\SecretsManager\SecretsManagerClient;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
