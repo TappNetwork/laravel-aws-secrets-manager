@@ -2,7 +2,28 @@
 
 return [
 
+    /*
+    |--------------------------------------------------------------------------
+    | AWS Region where secrets are stored
+    |--------------------------------------------------------------------------
+    |
+    | The AWS Region where secrets are stored.
+    |
+    */
+
     'region' => env('AWS_DEFAULT_REGION'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Tag used to return list of Secrets
+    |--------------------------------------------------------------------------
+    |
+    | All the secrets with the `dev` tag will be loaded into enviroment variables
+    |
+    */
+
+    'tag-name' => env('AWS_SECRETS_TAG_NAME', 'stage'),
+    'tag-value' => env('AWS_SECRETS_TAG_VALUE', 'dev'),
 
     /*
     |--------------------------------------------------------------------------

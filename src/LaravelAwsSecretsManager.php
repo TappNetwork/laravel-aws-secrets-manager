@@ -10,17 +10,21 @@ use Illuminate\Support\Facades\Log;
 class LaravelAwsSecretsManager
 {
     protected $client;
-    protected $variables;
     protected $configVariables;
     protected $cache;
     protected $cacheExpiry;
     protected $cacheStore;
-    protected $enabledEnvironments;
     protected $debug;
+    protected $enabledEnvironments;
+    protected $listTag;
+    protected $variables;
 
     public function __construct()
     {
         $this->variables = config('aws-secrets-manager.variables');
+
+        $this->listTagName = config('aws-secrets-manager.tag-name');
+        $this->listTagValue = config('aws-secrets-manager.tag-value');
 
         $this->configVariables = config('aws-secrets-manager.variables-config');
 
@@ -43,7 +47,7 @@ class LaravelAwsSecretsManager
         }
 
         //Only run this if the evironment is enabled in the config
-        if (in_array(env('APP_ENV'), $this->enabledEnvironments)) {
+        if (in_array(config('app.env'), $this->enabledEnvironments)) {
             if ($this->cache) {
                 if (! $this->checkCache()) {
                     //Cache has expired need to refresh the cache from Datastore
@@ -85,15 +89,33 @@ class LaravelAwsSecretsManager
                 'region' => config('aws-secrets-manager.region'),
             ]);
 
-            $result = $this->client->getSecretValue([
-                'SecretId' => config('aws-secrets-manager.secrentsArn'),
+            $secrets = $this->client->listSecrets([
+                'Filters' => [
+                    [
+                        'Key' => 'tag-key',
+                        'Values' => [$this->listTagName],
+                    ],
+                    [
+                        'Key' => 'tag-value',
+                        'Values' => [$this->listTagValue],
+                    ],
+                ],
+                'MaxResults' => 100,
             ]);
 
-            $values = json_decode($result['SecretString'], true);
+            foreach ($secrets as $secret) {
+                foreach ($secret as $item) {
+                    if (isset($item['ARN'])) {
+                        $result = $this->client->getSecretValue([
+                            'SecretId' => $item['ARN'],
+                        ]);
 
-            foreach (json_decode($result['SecretString'], true) as $key => $secret) {
-                putenv("$key=$secret");
-                $this->storeToCache($key, $secret);
+                        foreach (json_decode($result['SecretString'], true) as $key => $value) {
+                            putenv("$key=$secret");
+                            $this->storeToCache($key, $secret);
+                        }
+                    }
+                }
             }
         } catch (\Exception $e) {
             Log::error($e->getMessage());

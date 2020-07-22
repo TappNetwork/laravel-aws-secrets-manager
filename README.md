@@ -15,10 +15,35 @@ You can install the package via composer:
 composer require tapp/laravel-aws-secrets-manager
 ```
 
+Publish Config:
+```
+php artisan vendor:publish --provider="Tapp\LaravelAwsSecretsManager\LaravelAwsSecretsManagerServiceProvider"
+```
+
 ## Usage
 
+This package will try and load in secrets from AWS Secrets manager in any environment that is in the `enabled-environments` config array.  It is recommended that caching is enabled to reduce round trips to AWS Secrets Manager.
+
+Available env values:
 ``` php
-// Usage description here
+AWS_DEFAULT_REGION
+AWS_SECRETS_TAG_NAME=stage
+AWS_SECRETS_TAG_VALUE=production
+```
+
+`AWS_SECRETS_TAG_NAME` and `AWS_SECRETS_TAG_VALUE` are used to pull down all the secrets that match the tag key/value.
+
+### Setting up AWS Secrets
+
+1. Store New Secret.
+1. Select type of secret, one of AWS managed or other.
+1. Enter Key/Value, the KEY should match a env variable.
+1. Give it a secret name and description
+1. Add a tag key/value (stage => production) is an example if you want to pull down all production secrets.
+
+### Cache the config
+```
+php artisan config:cache
 ```
 
 ### AWS Credentials
