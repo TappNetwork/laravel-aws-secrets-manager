@@ -102,23 +102,23 @@ class LaravelAwsSecretsManager
                 ],
                 'MaxResults' => 100,
             ]);
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
+        }
 
-            foreach ($secrets as $secret) {
-                foreach ($secret as $item) {
-                    if (isset($item['ARN'])) {
-                        $result = $this->client->getSecretValue([
-                            'SecretId' => $item['ARN'],
-                        ]);
+        foreach ($secrets as $secret) {
+            foreach ($secret as $item) {
+                if (isset($item['ARN'])) {
+                    $result = $this->client->getSecretValue([
+                        'SecretId' => $item['ARN'],
+                    ]);
 
-                        foreach (json_decode($result['SecretString'], true) as $key => $secret) {
-                            putenv("$key=$secret");
-                            $this->storeToCache($key, $secret);
-                        }
+                    foreach (json_decode($result['SecretString'], true) as $key => $secret) {
+                        putenv("$key=$secret");
+                        $this->storeToCache($key, $secret);
                     }
                 }
             }
-        } catch (\Exception $e) {
-            Log::error($e->getMessage());
         }
     }
 
