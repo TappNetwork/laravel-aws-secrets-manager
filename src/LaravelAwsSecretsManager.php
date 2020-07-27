@@ -86,6 +86,10 @@ class LaravelAwsSecretsManager
             $this->client = new SecretsManagerClient([
                 'version' => '2017-10-17',
                 'region' => config('aws-secrets-manager.region'),
+                'credentials' => [
+                    'key'    => config('aws-secrets-manager.key'),
+                    'secret' => config('aws-secrets-manager.secret'),
+                ],
             ]);
 
             $secrets = $this->client->listSecrets([
@@ -106,19 +110,17 @@ class LaravelAwsSecretsManager
             return;
         }
 
-        foreach ($secrets as $secret) {
-            foreach ($secret as $item) {
-                if (isset($item['ARN'])) {
-                    $result = $this->client->getSecretValue([
-                        'SecretId' => $item['ARN'],
-                    ]);
+        foreach ($secrets["SecretList"] as $secret) {
+            if (isset($secret['ARN'])) {
+                $result = $this->client->getSecretValue([
+                    'SecretId' => $secret['ARN'],
+                ]);
 
-                    $secretValues = json_decode($result['SecretString'], true);
-                    if (is_array($secretValues)) {
-                        foreach ($secretValues as $key => $secret) {
-                            putenv("$key=$secret");
-                            $this->storeToCache($key, $secret);
-                        }
+                $secretValues = json_decode($result['SecretString'], true);
+                if (is_array($secretValues)) {
+                    foreach ($secretValues as $key => $secret) {
+                        putenv("$key=$secret");
+                        $this->storeToCache($key, $secret);
                     }
                 }
             }
