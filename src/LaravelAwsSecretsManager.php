@@ -110,7 +110,7 @@ class LaravelAwsSecretsManager
             return;
         }
 
-        foreach ($secrets["SecretList"] as $secret) {
+        foreach ($secrets['SecretList'] as $secret) {
             if (isset($secret['ARN'])) {
                 $result = $this->client->getSecretValue([
                     'SecretId' => $secret['ARN'],
