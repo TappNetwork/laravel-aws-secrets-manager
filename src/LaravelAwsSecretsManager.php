@@ -135,7 +135,6 @@ class LaravelAwsSecretsManager
                         return false;
                     }
 
-
                     $secretValues = json_decode($result['SecretString'], true);
                     if (is_array($secretValues)) {
                         foreach ($secretValues as $key => $secret) {
