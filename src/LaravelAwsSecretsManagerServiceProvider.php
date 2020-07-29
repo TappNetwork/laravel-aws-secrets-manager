@@ -21,7 +21,8 @@ class LaravelAwsSecretsManagerServiceProvider extends ServiceProvider
             Commands\LoadCredentials::class,
         ]);
 
-        app('aws-secrets')->loadSecrets();
+        // This assumes the wrong aws role role when loaded from boot.
+        // app('aws-secrets')->loadSecrets();
     }
 
     /**
