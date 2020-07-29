@@ -20,6 +20,8 @@ class LaravelAwsSecretsManagerServiceProvider extends ServiceProvider
         $this->commands([
             Commands\LoadCredentials::class,
         ]);
+
+        app('aws-secrets')->loadSecrets();
     }
 
     /**
