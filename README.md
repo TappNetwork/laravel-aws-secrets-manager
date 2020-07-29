@@ -76,7 +76,7 @@ If you discover any security related issues, please email security@tappnetwork.c
 
 ## Credits
 
-- [Steve Williamson](https://github.com/tapp)
+- [Steve Williamson](https://github.com/tappnetwork)
 - [All Contributors](../../contributors)
 
 ## License

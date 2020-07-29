@@ -2,12 +2,14 @@
 
 namespace Tapp\LaravelAwsSecretsManager;
 
+use Aws\Exception\AwsException;
 use Aws\SecretsManager\SecretsManagerClient;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 class LaravelAwsSecretsManager
 {
+    protected $app;
     protected $client;
     protected $configVariables;
     protected $cache;
@@ -18,8 +20,10 @@ class LaravelAwsSecretsManager
     protected $listTag;
     protected $variables;
 
-    public function __construct()
+    public function __construct($app)
     {
+        $this->app = $app;
+
         $this->variables = config('aws-secrets-manager.variables');
 
         $this->listTagName = config('aws-secrets-manager.tag-name');
@@ -36,6 +40,11 @@ class LaravelAwsSecretsManager
         $this->enabledEnvironments = config('aws-secrets-manager.enabled-environments', []);
 
         $this->debug = config('aws-secrets-manager.debug', false);
+
+        $this->client = new SecretsManagerClient([
+            'version' => '2017-10-17',
+            'region' => config('aws-secrets-manager.region'),
+        ]);
     }
 
     public function loadSecrets()
@@ -64,6 +73,8 @@ class LaravelAwsSecretsManager
             $time_elapsed_secs = microtime(true) - $start;
             error_log('Datastore secret request time: '.$time_elapsed_secs);
         }
+
+        return true;
     }
 
     protected function checkCache()
@@ -83,11 +94,6 @@ class LaravelAwsSecretsManager
     protected function getVariables()
     {
         try {
-            $this->client = new SecretsManagerClient([
-                'version' => '2017-10-17',
-                'region' => config('aws-secrets-manager.region'),
-            ]);
-
             $secrets = $this->client->listSecrets([
                 'Filters' => [
                     [
@@ -101,17 +107,35 @@ class LaravelAwsSecretsManager
                 ],
                 'MaxResults' => 100,
             ]);
+        } catch (AwsException $e) {
+            $error = $e->getAwsErrorCode();
+            Log::error($e);
+
+            return false;
         } catch (\Exception $e) {
-            Log::error($e->getMessage());
-            return;
+            report($e);
+
+            return false;
         }
 
         foreach ($secrets as $secret) {
             foreach ($secret as $item) {
                 if (isset($item['ARN'])) {
-                    $result = $this->client->getSecretValue([
-                        'SecretId' => $item['ARN'],
-                    ]);
+                    try {
+                        $result = $this->client->getSecretValue([
+                            'SecretId' => $item['ARN'],
+                        ]);
+                    } catch (AwsException $e) {
+                        $error = $e->getAwsErrorCode();
+                        Log::error($e);
+
+                        return false;
+                    } catch (\Exception $e) {
+                        report($e);
+
+                        return false;
+                    }
+
 
                     $secretValues = json_decode($result['SecretString'], true);
                     if (is_array($secretValues)) {
