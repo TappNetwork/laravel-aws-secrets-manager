@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Log;
 class LaravelAwsSecretsManager
 {
     protected $app;
-    protected $client;
     protected $configVariables;
     protected $cache;
     protected $cacheExpiry;
@@ -40,11 +39,6 @@ class LaravelAwsSecretsManager
         $this->enabledEnvironments = config('aws-secrets-manager.enabled-environments', []);
 
         $this->debug = config('aws-secrets-manager.debug', false);
-
-        $this->client = new SecretsManagerClient([
-            'version' => '2017-10-17',
-            'region' => config('aws-secrets-manager.region'),
-        ]);
     }
 
     public function loadSecrets()
@@ -94,7 +88,12 @@ class LaravelAwsSecretsManager
     protected function getVariables()
     {
         try {
-            $secrets = $this->client->listSecrets([
+            $client = new SecretsManagerClient([
+                'version' => '2017-10-17',
+                'region' => config('aws-secrets-manager.region'),
+            ]);
+
+            $secrets = $client->listSecrets([
                 'Filters' => [
                     [
                         'Key' => 'tag-key',
@@ -122,7 +121,7 @@ class LaravelAwsSecretsManager
             foreach ($secret as $item) {
                 if (isset($item['ARN'])) {
                     try {
-                        $result = $this->client->getSecretValue([
+                        $result = $client->getSecretValue([
                             'SecretId' => $item['ARN'],
                         ]);
                     } catch (AwsException $e) {
@@ -140,6 +139,9 @@ class LaravelAwsSecretsManager
                     $secretValues = json_decode($result['SecretString'], true);
                     if (is_array($secretValues)) {
                         foreach ($secretValues as $key => $secret) {
+                            if ($this->debug) {
+                                \Log::info($key);
+                            }
                             putenv("$key=$secret");
                             $this->storeToCache($key, $secret);
                         }
@@ -152,6 +154,9 @@ class LaravelAwsSecretsManager
     protected function updateConfigs()
     {
         foreach ($this->configVariables as $variable => $configPath) {
+            if ($this->debug) {
+                \Log::info('Config Path: '.$configPath);
+            }
             config([$configPath => env($variable)]);
         }
     }
