@@ -42,19 +42,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | List of variables that are stored in Datastore
-    |--------------------------------------------------------------------------
-    |
-    | List all of the keys that should be loaded from datastore -these must all exist. These variables will be loaded into the env()
-    |
-    */
-
-    'variables' => [
-        'APP_KEY',
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
     | Variables that require overwriting the config
     |--------------------------------------------------------------------------
     |
