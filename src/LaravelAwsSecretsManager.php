@@ -106,13 +106,9 @@ class LaravelAwsSecretsManager
                     'SecretId' => $secret['ARN'],
                 ]);
 
-                $secretValues = json_decode($result['SecretString'], true);
-                if (is_array($secretValues)) {
-                    foreach ($secretValues as $key => $secret) {
-                        putenv("$key=$secret");
-                        $this->storeToCache($key, $secret);
-                    }
-                }
+                $envString = $result['Name'].'='.$result['SecretString'];
+                putenv("$envString");
+                $this->storeToCache($result['Name'], $result['SecretString']);
             }
         }
     }
