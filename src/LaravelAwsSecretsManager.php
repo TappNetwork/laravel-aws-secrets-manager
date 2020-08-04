@@ -79,10 +79,6 @@ class LaravelAwsSecretsManager
             $this->client = new SecretsManagerClient([
                 'version' => '2017-10-17',
                 'region' => config('aws-secrets-manager.region'),
-                'credentials' => [
-                    'key'    => config('aws-secrets-manager.key'),
-                    'secret' => config('aws-secrets-manager.secret'),
-                ],
             ]);
 
             $secrets = $this->client->listSecrets([
