@@ -105,7 +105,9 @@ class LaravelAwsSecretsManager
                 $result = $this->client->getSecretValue([
                     'SecretId' => $secret['ARN'],
                 ]);
-
+                $key = $result['Name'];
+                $secret = $result['SecretString'];
+                putenv("$key=$secret");
                 $this->storeToCache($result['Name'], $result['SecretString']);
             }
         }
@@ -114,7 +116,7 @@ class LaravelAwsSecretsManager
     protected function updateConfigs()
     {
         foreach ($this->configVariables as $variable => $configPath) {
-            config([$configPath => Cache::store($this->cacheStore)->get($variable)]);
+            config([$configPath => env($variable)]);
         }
     }
 
