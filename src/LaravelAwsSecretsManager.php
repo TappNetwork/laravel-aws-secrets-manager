@@ -16,12 +16,9 @@ class LaravelAwsSecretsManager
     protected $debug;
     protected $enabledEnvironments;
     protected $listTag;
-    protected $variables;
 
     public function __construct()
     {
-        $this->variables = config('aws-secrets-manager.variables');
-
         $this->listTagName = config('aws-secrets-manager.tag-name');
         $this->listTagValue = config('aws-secrets-manager.tag-value');
 
@@ -47,12 +44,8 @@ class LaravelAwsSecretsManager
 
         //Only run this if the evironment is enabled in the config
         if (in_array(config('app.env'), $this->enabledEnvironments)) {
-            if ($this->cache) {
-                if (! $this->checkCache()) {
-                    //Cache has expired need to refresh the cache from Datastore
-                    $this->getVariables();
-                }
-            } else {
+            if (! $this->checkCache()) {
+                //Cache has expired need to refresh the cache from Datastore
                 $this->getVariables();
             }
 
@@ -68,7 +61,7 @@ class LaravelAwsSecretsManager
 
     protected function checkCache()
     {
-        foreach ($this->variables as $variable) {
+        foreach ($this->configVariables as $variable => $configPath) {
             $val = Cache::store($this->cacheStore)->get($variable);
             if (! is_null($val)) {
                 putenv("$variable=$val");
@@ -103,24 +96,19 @@ class LaravelAwsSecretsManager
             ]);
         } catch (\Exception $e) {
             Log::error($e->getMessage());
+
             return;
         }
 
-        foreach ($secrets as $secret) {
-            foreach ($secret as $item) {
-                if (isset($item['ARN'])) {
-                    $result = $this->client->getSecretValue([
-                        'SecretId' => $item['ARN'],
-                    ]);
-
-                    $secretValues = json_decode($result['SecretString'], true);
-                    if (is_array($secretValues)) {
-                        foreach ($secretValues as $key => $secret) {
-                            putenv("$key=$secret");
-                            $this->storeToCache($key, $secret);
-                        }
-                    }
-                }
+        foreach ($secrets['SecretList'] as $secret) {
+            if (isset($secret['ARN'])) {
+                $result = $this->client->getSecretValue([
+                    'SecretId' => $secret['ARN'],
+                ]);
+                $key = $result['Name'];
+                $secret = $result['SecretString'];
+                putenv("$key=$secret");
+                $this->storeToCache($result['Name'], $result['SecretString']);
             }
         }
     }
