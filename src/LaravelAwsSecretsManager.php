@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 
 namespace Tapp\LaravelAwsSecretsManager;
 
@@ -6,16 +7,18 @@ use Aws\SecretsManager\SecretsManagerClient;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
-class LaravelAwsSecretsManager
+final class LaravelAwsSecretsManager
 {
-    protected $client;
-    protected $configVariables;
-    protected $cache;
-    protected $cacheExpiry;
-    protected $cacheStore;
-    protected $debug;
-    protected $enabledEnvironments;
-    protected $listTag;
+    private $client;
+    private $configVariables;
+    private $cache;
+    private $cacheExpiry;
+    private $cacheStore;
+    private $debug;
+    private $enabledEnvironments;
+    private $listTagName;
+    private $listTagValue;
+
 
     public function __construct(SecretsManagerClient $client)
     {
