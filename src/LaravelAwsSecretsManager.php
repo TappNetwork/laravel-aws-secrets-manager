@@ -1,10 +1,11 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Tapp\LaravelAwsSecretsManager;
 
 use Aws\SecretsManager\SecretsManagerClient;
+use Exception;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
@@ -19,7 +20,6 @@ final class LaravelAwsSecretsManager
     private $enabledEnvironments;
     private $listTagName;
     private $listTagValue;
-
 
     public function __construct(SecretsManagerClient $client)
     {
@@ -42,8 +42,8 @@ final class LaravelAwsSecretsManager
             $start = microtime(true);
         }
 
-        //Only run this if the evironment is enabled in the config
-        if (in_array(config('app.env'), $this->enabledEnvironments)) {
+        //Only run this if the environment is enabled in the config
+        if (in_array(config('app.env'), $this->enabledEnvironments, true)) {
             if (! $this->checkCache()) {
                 //Cache has expired need to refresh the cache from Datastore
                 $this->getVariables();
@@ -89,7 +89,7 @@ final class LaravelAwsSecretsManager
                 ],
                 'MaxResults' => 100,
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error($e->getMessage());
 
             return;
