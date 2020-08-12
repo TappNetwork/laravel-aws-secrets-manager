@@ -37,7 +37,7 @@ class LaravelAwsSecretsManager
         $this->client = $client;
     }
 
-    public function loadSecrets()
+    public function loadSecrets(): void
     {
         //load vars from datastore to env
         if ($this->debug) {
@@ -61,7 +61,7 @@ class LaravelAwsSecretsManager
         }
     }
 
-    protected function checkCache()
+    protected function checkCache(): bool
     {
         foreach ($this->configVariables as $variable => $configPath) {
             $val = Cache::store($this->cacheStore)->get($variable);
@@ -75,7 +75,7 @@ class LaravelAwsSecretsManager
         return true;
     }
 
-    protected function getVariables()
+    protected function getVariables(): void
     {
         try {
             $secrets = $this->client->listSecrets([
@@ -110,14 +110,14 @@ class LaravelAwsSecretsManager
         }
     }
 
-    protected function updateConfigs()
+    protected function updateConfigs(): void
     {
         foreach ($this->configVariables as $variable => $configPath) {
             config([$configPath => env($variable)]);
         }
     }
 
-    protected function storeToCache($name, $val)
+    protected function storeToCache(string $name, string $val): void
     {
         if ($this->cache) {
             Cache::store($this->cacheStore)->put($name, $val, now()->addMinutes($this->cacheExpiry));
