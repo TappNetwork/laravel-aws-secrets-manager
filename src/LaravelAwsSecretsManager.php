@@ -55,7 +55,7 @@ final class LaravelAwsSecretsManager
 
         if ($this->debug) {
             $time_elapsed_secs = microtime(true) - $start;
-            error_log('Datastore secret request time: '.$time_elapsed_secs);
+            Log::info('Datastore secret request time: '.$time_elapsed_secs);
         }
     }
 
