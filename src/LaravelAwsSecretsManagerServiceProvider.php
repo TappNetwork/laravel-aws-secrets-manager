@@ -2,6 +2,7 @@
 
 namespace Tapp\LaravelAwsSecretsManager;
 
+use Aws\SecretsManager\SecretsManagerClient;
 use Illuminate\Support\ServiceProvider;
 
 class LaravelAwsSecretsManagerServiceProvider extends ServiceProvider
@@ -17,8 +18,13 @@ class LaravelAwsSecretsManagerServiceProvider extends ServiceProvider
             ], 'config');
         }
 
+        $client = new SecretsManagerClient([
+            'version' => '2017-10-17',
+            'region' => config('aws-secrets-manager.region'),
+        ]);
+
         // Load Secrets
-        $secretsManager = new LaravelAwsSecretsManager();
+        $secretsManager = new LaravelAwsSecretsManager($client);
         $secretsManager->loadSecrets();
     }
 

@@ -17,7 +17,7 @@ class LaravelAwsSecretsManager
     protected $enabledEnvironments;
     protected $listTag;
 
-    public function __construct()
+    public function __construct(SecretsManagerClient $client)
     {
         $this->listTagName = config('aws-secrets-manager.tag-name');
         $this->listTagValue = config('aws-secrets-manager.tag-value');
@@ -33,6 +33,8 @@ class LaravelAwsSecretsManager
         $this->enabledEnvironments = config('aws-secrets-manager.enabled-environments', []);
 
         $this->debug = config('aws-secrets-manager.debug', false);
+
+        $this->client = $client;
     }
 
     public function loadSecrets()
@@ -76,11 +78,6 @@ class LaravelAwsSecretsManager
     protected function getVariables()
     {
         try {
-            $this->client = new SecretsManagerClient([
-                'version' => '2017-10-17',
-                'region' => config('aws-secrets-manager.region'),
-            ]);
-
             $secrets = $this->client->listSecrets([
                 'Filters' => [
                     [
