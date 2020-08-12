@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types = 1);
 
 namespace Tapp\LaravelAwsSecretsManager;
@@ -24,17 +25,11 @@ final class LaravelAwsSecretsManager
     {
         $this->listTagName = config('aws-secrets-manager.tag-name');
         $this->listTagValue = config('aws-secrets-manager.tag-value');
-
         $this->configVariables = config('aws-secrets-manager.variables-config');
-
         $this->cache = config('aws-secrets-manager.cache-enabled', true);
-
         $this->cacheExpiry = config('aws-secrets-manager.cache-expiry', 0);
-
         $this->cacheStore = config('aws-secrets-manager.cache-store', 'file');
-
         $this->enabledEnvironments = config('aws-secrets-manager.enabled-environments', []);
-
         $this->debug = config('aws-secrets-manager.debug', false);
 
         $this->client = $client;
