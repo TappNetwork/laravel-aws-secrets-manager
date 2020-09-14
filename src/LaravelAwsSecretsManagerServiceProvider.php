@@ -18,8 +18,10 @@ class LaravelAwsSecretsManagerServiceProvider extends ServiceProvider
         }
 
         // Load Secrets
-        $secretsManager = new LaravelAwsSecretsManager();
-        $secretsManager->loadSecrets();
+        if (config('aws-secrets-manager.enable-secrets-manager')) {
+            $secretsManager = new LaravelAwsSecretsManager();
+            $secretsManager->loadSecrets();
+        }
     }
 
     /**
