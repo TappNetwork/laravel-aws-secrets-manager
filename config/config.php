@@ -12,6 +12,7 @@ return [
     */
 
     'region' => env('AWS_DEFAULT_REGION'),
+    'enable-secrets-manager' => env('ENABLE_SECRETS_MANAGER', false),
 
     /*
     |--------------------------------------------------------------------------
