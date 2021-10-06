@@ -1,1 +1,0 @@
-C:37:"PHPUnit\Runner\DefaultTestResultCache":194:{a:2:{s:7:"defects";a:1:{s:61:"Tapp\LaravelAwsSecretsManager\Tests\ExampleTest::true_is_true";i:4;}s:5:"times";a:1:{s:61:"Tapp\LaravelAwsSecretsManager\Tests\ExampleTest::true_is_true";d:0.209;}}}
