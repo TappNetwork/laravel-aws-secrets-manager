@@ -13,7 +13,7 @@ class LaravelAwsSecretsManagerServiceProvider extends ServiceProvider
     {
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__.'/../config/config.php' => config_path('aws-secrets-manager.php'),
+                __DIR__.'/../config/config.php' => base_path('config/aws-secrets-manager.php'),
             ], 'config');
         }
 
