@@ -126,7 +126,7 @@ class LaravelAwsSecretsManager
     protected function storeToCache($name, $val)
     {
         if ($this->cache) {
-            Cache::store($this->cacheStore)->put($name, $val, now()->addMinutes($this->cacheExpiry));
+            Cache::store($this->cacheStore)->put($name, $val, $this->cacheExpiry * 60);
         }
     }
 }
