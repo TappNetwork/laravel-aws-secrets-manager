@@ -19,7 +19,7 @@ return [
     | Tag used to return list of Secrets
     |--------------------------------------------------------------------------
     |
-    | All the secrets with the `dev` tag will be loaded into enviroment variables
+    | All the secrets with the `dev` tag will be loaded into environment variables
     |
     */
 
@@ -56,7 +56,7 @@ return [
     | Cache Enabled
     |--------------------------------------------------------------------------
     |
-    | Boolean if you would like to enable cache. Datastore requests can add an additional 100-250ms of latency to each request. It is reccomended to use caching to significantly reduce this latency.
+    | Boolean if you would like to enable cache. Datastore requests can add an additional 100-250ms of latency to each request. It is recommended to use caching to significantly reduce this latency.
     |
     */
 
@@ -67,7 +67,7 @@ return [
     | Cache Expiry
     |--------------------------------------------------------------------------
     |
-    | The length of time that the Cache should be enabled for in minutes. 30-60 minutes is reccomended.
+    | The length of time that the Cache should be enabled for in minutes. 30-60 minutes is recommended.
     |
     */
 
@@ -78,7 +78,7 @@ return [
     | Cache Store
     |--------------------------------------------------------------------------
     |
-    | Define the cache store that you wish to use (this must be configured in your config.cache file). Note you can only use a store that ddoes not require credentials to access it. As such file is suggested.
+    | Define the cache store that you wish to use (this must be configured in your config.cache file). Note you can only use a store that does not require credentials to access it. As such file is suggested.
     |
     */
 
