@@ -16,9 +16,9 @@
         }
     ],
     "require": {
-        "php": "^8.0",
+        "php": "^7.4 || ^8.0",
         "aws/aws-sdk-php": "^3.219",
-        "illuminate/support": "^9.8"
+        "illuminate/support": "^6.0 || ^7.0 || ^8.0 || ^9.8"
     },
     "require-dev": {
         "orchestra/testbench": "^7.4",
