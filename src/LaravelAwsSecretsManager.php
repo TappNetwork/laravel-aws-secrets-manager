@@ -37,19 +37,19 @@ class LaravelAwsSecretsManager
 
     public function loadSecrets()
     {
-        //load vars from datastore to env
+        // Load vars from datastore to env
         if ($this->debug) {
             $start = microtime(true);
         }
 
-        //Only run this if the evironment is enabled in the config
+        // Only run this if the evironment is enabled in the config
         if (in_array(config('app.env'), $this->enabledEnvironments)) {
             if (! $this->checkCache()) {
-                //Cache has expired need to refresh the cache from Datastore
+                // Cache has expired need to refresh the cache from Datastore
                 $this->getVariables();
             }
 
-            //Process variables in config that need updating
+            // Process variables in config that need updating
             $this->updateConfigs();
         }
 
@@ -63,6 +63,7 @@ class LaravelAwsSecretsManager
     {
         foreach ($this->configVariables as $variable => $configPath) {
             $val = Cache::store($this->cacheStore)->get($variable);
+
             if (! is_null($val)) {
                 putenv("$variable=$val");
             } else {
@@ -105,6 +106,7 @@ class LaravelAwsSecretsManager
                 $result = $this->client->getSecretValue([
                     'SecretId' => $secret['ARN'],
                 ]);
+
                 $secretValues = json_decode($result['SecretString'], true);
 
                 if (is_array($secretValues) && count($secretValues) > 0) {
