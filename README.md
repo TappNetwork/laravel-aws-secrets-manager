@@ -56,6 +56,9 @@ AWS_SECRET_ACCESS_KEY
 ```
 [https://docs.aws.amazon.com/sdk-for-php/v3/developer-guide/guide_credentials.html](https://docs.aws.amazon.com/sdk-for-php/v3/developer-guide/guide_credentials.html)
 
+### Key Rotation
+If key rotation is enabled, the most recent next rotation date is cached and if it's in the past we force getting the secrets.
+
 ### Testing
 
 ``` bash
