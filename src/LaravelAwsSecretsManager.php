@@ -2,7 +2,6 @@
 
 namespace Tapp\LaravelAwsSecretsManager;
 
-use Aws\Api\DateTimeResult;
 use Aws\SecretsManager\SecretsManagerClient;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
@@ -70,8 +69,9 @@ class LaravelAwsSecretsManager
             if (
                 blank($cachedNextRotationDate) ||
                 $cachedNextRotationDate < Carbon::now()
-            )
+            ) {
                 return false;
+            }
         }
 
         foreach ($this->configVariables as $variable => $configPath) {
@@ -150,7 +150,7 @@ class LaravelAwsSecretsManager
         }
 
         if ($this->keyRotation) {
-            $this->storeToCache("AWSSecretsNextRotationDate", $nextRotationDateToCache);
+            $this->storeToCache('AWSSecretsNextRotationDate', $nextRotationDateToCache);
         }
     }
 
