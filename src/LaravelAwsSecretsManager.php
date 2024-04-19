@@ -3,6 +3,7 @@
 namespace Tapp\LaravelAwsSecretsManager;
 
 use Aws\SecretsManager\SecretsManagerClient;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
@@ -33,6 +34,8 @@ class LaravelAwsSecretsManager
         $this->enabledEnvironments = config('aws-secrets-manager.enabled-environments', []);
 
         $this->debug = config('aws-secrets-manager.debug', false);
+
+        $this->keyRotation = config('aws-secrets-manager.key-rotation');
     }
 
     public function loadSecrets()
@@ -61,6 +64,16 @@ class LaravelAwsSecretsManager
 
     protected function checkCache()
     {
+        if ($this->keyRotation) {
+            $cachedNextRotationDate = Cache::store($this->cacheStore)->get('AWSSecretsNextRotationDate');
+            if (
+                blank($cachedNextRotationDate) ||
+                $cachedNextRotationDate < Carbon::now()
+            ) {
+                return false;
+            }
+        }
+
         foreach ($this->configVariables as $variable => $configPath) {
             $val = Cache::store($this->cacheStore)->get($variable);
 
@@ -101,6 +114,10 @@ class LaravelAwsSecretsManager
             return;
         }
 
+        if ($this->keyRotation) {
+            $nextRotationDateToCache = null;
+        }
+
         foreach ($secrets['SecretList'] as $secret) {
             if (isset($secret['ARN'])) {
                 $result = $this->client->getSecretValue([
@@ -110,6 +127,13 @@ class LaravelAwsSecretsManager
                 $secretValues = json_decode($result['SecretString'], true);
 
                 if (is_array($secretValues) && count($secretValues) > 0) {
+                    if ($this->keyRotation) {
+                        $nextRotationDate = Carbon::instance($secret['NextRotationDate']);
+                        if ($nextRotationDate < $nextRotationDateToCache) {
+                            $nextRotationDateToCache = $nextRotationDate;
+                        }
+                    }
+
                     if (isset($secretValues['name']) && isset($secretValues['value'])) {
                         $key = $secretValues['name'];
                         $secret = $secretValues['value'];
@@ -123,6 +147,10 @@ class LaravelAwsSecretsManager
                     }
                 }
             }
+        }
+
+        if ($this->keyRotation) {
+            $this->storeToCache('AWSSecretsNextRotationDate', $nextRotationDateToCache);
         }
     }
 
