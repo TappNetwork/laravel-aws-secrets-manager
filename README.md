@@ -1,8 +1,7 @@
 # AWS Secrets Manager
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/tapp/laravel-aws-secrets-manager.svg?style=flat-square)](https://packagist.org/packages/tapp/laravel-aws-secrets-manager)
-[![Build Status](https://img.shields.io/travis/tapp/laravel-aws-secrets-manager/master.svg?style=flat-square)](https://travis-ci.org/tapp/laravel-aws-secrets-manager)
-[![Quality Score](https://img.shields.io/scrutinizer/g/tapp/laravel-aws-secrets-manager.svg?style=flat-square)](https://scrutinizer-ci.com/g/tapp/laravel-aws-secrets-manager)
+![Tests Laravel 10](https://github.com/TappNetwork/laravel-aws-secrets-manager/actions/workflows/run-tests-l10.yml/badge.svg)
 [![Total Downloads](https://img.shields.io/packagist/dt/tapp/laravel-aws-secrets-manager.svg?style=flat-square)](https://packagist.org/packages/tapp/laravel-aws-secrets-manager)
 
 Manage environment secrets using AWS Secrets Manager.
