@@ -36,9 +36,7 @@ return [
     |
     */
 
-    'enabled-environments' => [
-        'production',
-    ],
+    'enabled-environments' => array_filter(explode(',', env('AWS_SECRETS_ENABLED_ENV', 'production'))),
 
     /*
     |--------------------------------------------------------------------------
@@ -48,10 +46,19 @@ return [
     | Some (not all) variables are set into the config, as such updating the env() will not overwrite
     | the config cached values. The variables below will overwrite the config.
     |
+    | Example:
+    | .env
+    | VARIABLES_CONFIG_KEYS=APP_KEY:app.key,OTHER_KEY:app.other_key
+    |
     */
-    'variables-config' => [
-        'APP_KEY' => 'app.key',
-    ],
+
+    'variables-config' => collect(array_filter(explode(',', env('AWS_SECRETS_VARIABLES_CONFIGS', ''))))
+        ->mapWithKeys(function ($pair) {
+            [$envKey, $configKey] = explode(':', $pair);
+
+            return [$envKey => $configKey];
+        })
+        ->toArray(),
 
     /*
     |--------------------------------------------------------------------------
@@ -63,7 +70,7 @@ return [
     |
     */
 
-    'cache-enabled' => true, // boolean
+    'cache-enabled' => env('AWS_SECRETS_CACHE_ENABLED', true),
 
     /*
     |--------------------------------------------------------------------------
@@ -74,7 +81,7 @@ return [
     |
     */
 
-    'cache-expiry' => 30, // minutes
+    'cache-expiry' => env('AWS_SECRETS_CACHE_EXPIRY', 30),
 
     /*
     |--------------------------------------------------------------------------
@@ -86,7 +93,7 @@ return [
     |
     */
 
-    'cache-store' => 'file',
+    'cache-store' => env('AWS_SECRETS_CACHE_STORE', 'file'),
 
     /*
     |--------------------------------------------------------------------------
