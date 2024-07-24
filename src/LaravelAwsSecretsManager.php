@@ -15,8 +15,10 @@ class LaravelAwsSecretsManager
     protected $cacheExpiry;
     protected $cacheStore;
     protected $debug;
-    protected $enabledEnvironments;
-    protected $listTag;
+    protected array $enabledEnvironments;
+    protected bool $keyRotation;
+    protected string $listTagName = '';
+    protected string $listTagValue = '';
 
     public function __construct()
     {
