@@ -32,6 +32,37 @@ AWS_SECRETS_TAG_VALUE=production
 
 `AWS_SECRETS_TAG_NAME` and `AWS_SECRETS_TAG_VALUE` are used to pull down all the secrets that match the tag key/value.
 
+### Other Environment-based Configuration
+
+#### Enabled environments
+
+Specify which environments should have AWS Secrets enabled:
+
+`AWS_SECRETS_ENABLED_ENV=production,staging`
+
+Default: `production`
+
+#### Overwritable Variables Config
+
+Specify which variables should be able to overwrite the config using the `AWS_SECRETS_VARIABLES_CONFIGS` key in the `.env` file. The format is a comma-separated list of `ENV_VARIABLE_NAME:CONFIG_KEY` pairs.
+
+For example:
+
+`VARIABLES_CONFIG_KEYS=APP_KEY:app.key,OTHER_KEY:app.other_key`
+
+This setup allows `APP_KEY` to overwrite `app.key` in the config, and `OTHER_KEY` to overwrite `app.other_key`.
+
+Default Behavior: If `AWS_SECRETS_VARIABLES_CONFIGS` is not set or is empty, no variables will be set for config overwriting.
+
+#### Cache Settings
+
+For example:
+```
+AWS_SECRETS_CACHE_ENABLED=true
+AWS_SECRETS_CACHE_EXPIRY=60
+AWS_SECRETS_CACHE_STORE=file
+```
+
 ### Setting up AWS Secrets
 
 1. Store New Secret.
