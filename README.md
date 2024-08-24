@@ -69,7 +69,22 @@ AWS_SECRETS_CACHE_STORE=file
 1. Select type of secret, one of AWS managed or other.
 1. Enter Key/Value, the KEY should match a env variable.
 1. Give it a secret name and description
-1. Add a tag key/value (stage => production) is an example if you want to pull down all production secrets.
+1. (Optional) Add a tag key/value (stage => production) if you want to pull down secrets based on tags.
+
+#### Using the Secret ID (ARN or Name)
+
+For example:
+```
+AWS_SECRETS_SECRET_ID=app-secret-name
+```
+
+#### Using the Tag
+
+For example:
+```
+AWS_SECRETS_TAG_NAME=stage
+AWS_SECRETS_TAG_VALUE=production
+```
 
 ### Cache the config
 ```
