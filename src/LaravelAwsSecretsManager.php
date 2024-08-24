@@ -19,6 +19,7 @@ class LaravelAwsSecretsManager
     protected bool $keyRotation;
     protected string $listTagName = '';
     protected string $listTagValue = '';
+    protected string $secretID = '';
 
     public function __construct()
     {
@@ -38,6 +39,8 @@ class LaravelAwsSecretsManager
         $this->debug = config('aws-secrets-manager.debug', false);
 
         $this->keyRotation = config('aws-secrets-manager.key-rotation');
+
+        $this->secretID = config('aws-secrets-manager.secret-id');
     }
 
     public function loadSecrets()
@@ -96,56 +99,80 @@ class LaravelAwsSecretsManager
                 'version' => '2017-10-17',
                 'region' => config('aws-secrets-manager.region'),
             ]);
-
-            $secrets = $this->client->listSecrets([
-                'Filters' => [
-                    [
-                        'Key' => 'tag-key',
-                        'Values' => [$this->listTagName],
-                    ],
-                    [
-                        'Key' => 'tag-value',
-                        'Values' => [$this->listTagValue],
-                    ],
-                ],
-                'MaxResults' => 100,
-            ]);
         } catch (\Exception $e) {
             Log::error($e->getMessage());
 
             return;
         }
 
+        $secretIDs = [];
+
+        if ($this->secretID) {
+            $secretIDs[] = $this->secretID;
+        }
+
+        if ($this->listTagName && $this->listTagValue) {
+            try {
+                $secrets = $this->client->listSecrets([
+                    'Filters' => [
+                        [
+                            'Key' => 'tag-key',
+                            'Values' => [$this->listTagName],
+                        ],
+                        [
+                            'Key' => 'tag-value',
+                            'Values' => [$this->listTagValue],
+                        ],
+                    ],
+                    'MaxResults' => 100,
+                ]);
+            } catch (\Exception $e) {
+                Log::error($e->getMessage());
+
+                return;
+            }
+
+            foreach ($secrets['SecretList'] as $secret) {
+                if (isset($secret['ARN'])) {
+                    $secretIDs[] = $secret['ARN'];
+                }
+            }
+        }
+
         if ($this->keyRotation) {
             $nextRotationDateToCache = null;
         }
 
-        foreach ($secrets['SecretList'] as $secret) {
-            if (isset($secret['ARN'])) {
+        foreach ($secretIDs as $secretID) {
+            try {
                 $result = $this->client->getSecretValue([
-                    'SecretId' => $secret['ARN'],
+                    'SecretId' => $secretID,
                 ]);
+            } catch (\Exception $e) {
+                Log::error($e->getMessage());
 
-                $secretValues = json_decode($result['SecretString'], true);
+                continue;
+            }
 
-                if (is_array($secretValues) && count($secretValues) > 0) {
-                    if ($this->keyRotation) {
-                        $nextRotationDate = Carbon::instance($secret['NextRotationDate']);
-                        if ($nextRotationDate < $nextRotationDateToCache) {
-                            $nextRotationDateToCache = $nextRotationDate;
-                        }
+            $secretValues = json_decode($result['SecretString'], true);
+
+            if (is_array($secretValues) && count($secretValues) > 0) {
+                if ($this->keyRotation) {
+                    $nextRotationDate = Carbon::instance($secret['NextRotationDate']);
+                    if ($nextRotationDate < $nextRotationDateToCache) {
+                        $nextRotationDateToCache = $nextRotationDate;
                     }
+                }
 
-                    if (isset($secretValues['name']) && isset($secretValues['value'])) {
-                        $key = $secretValues['name'];
-                        $secret = $secretValues['value'];
-                        putenv("$key=$secret");
-                        $this->storeToCache($key, $secret);
-                    } else {
-                        foreach ($secretValues as $key => $value) {
-                            putenv("$key=$value");
-                            $this->storeToCache($key, $value);
-                        }
+                if (isset($secretValues['name']) && isset($secretValues['value'])) {
+                    $key = $secretValues['name'];
+                    $secret = $secretValues['value'];
+                    putenv("$key=$secret");
+                    $this->storeToCache($key, $secret);
+                } else {
+                    foreach ($secretValues as $key => $value) {
+                        putenv("$key=$value");
+                        $this->storeToCache($key, $value);
                     }
                 }
             }
